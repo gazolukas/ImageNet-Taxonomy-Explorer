@@ -69,19 +69,22 @@ function flattenSynset(node: XmlSynset, lineage: string[] = []): FlatNode[] {
   const name = pickWords(node);
   const currentPath = [...lineage, name];
   const path = currentPath.join(SEPARATOR);
+
+  const children = asArray(node.synset);
+  const descendantRows: FlatNode[] = [];
+
+  for (const child of children) {
+    descendantRows.push(...flattenSynset(child, currentPath));
+  }
+
   const row: FlatNode = {
     path,
     name,
-    size: toNumber(pickSubtree(node)),
+    size: descendantRows.length,
     depth: currentPath.length - 1,
   };
 
-  const children = asArray(node.synset);
-  const output: FlatNode[] = [row];
-  for (const child of children) {
-    output.push(...flattenSynset(child, currentPath));
-  }
-  return output;
+  return [row, ...descendantRows];
 }
 
 async function loadXml(): Promise<string> {
