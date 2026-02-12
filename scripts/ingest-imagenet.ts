@@ -1,21 +1,13 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, Taxonomy } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+import { Taxonomy } from "@prisma/client";
 import { XMLParser } from "fast-xml-parser";
 
 type FlatNode = Pick<Taxonomy, "path" | "name" | "size" | "depth">;
 
-const SOURCE_URL = "https://raw.githubusercontent.com/tzutalin/ImageNet_Utils/refs/heads/master/detection_eval_tools/structure_released.xml"
+const SOURCE_URL =
+  "https://raw.githubusercontent.com/tzutalin/ImageNet_Utils/refs/heads/master/detection_eval_tools/structure_released.xml";
 const SEPARATOR = " > ";
 const BATCH_SIZE = 1000;
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  throw new Error("DATABASE_URL is required.");
-}
-
-const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString }),
-});
 
 type XmlSynset = {
   words?: string;
@@ -32,17 +24,8 @@ function asArray<T>(value: T | T[] | undefined): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
-function toNumber(value: string | number | undefined): number {
-  const parsed = Number(value ?? 0);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
 function pickWords(node: XmlSynset): string {
   return (node.words ?? node["@_words"] ?? "unknown").trim();
-}
-
-function pickSubtree(node: XmlSynset): string | number | undefined {
-  return node.num_subtree ?? node["@_num_subtree"];
 }
 
 function findTopLevelSynsets(value: unknown): XmlSynset[] {

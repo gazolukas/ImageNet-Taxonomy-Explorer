@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useChildren, useTree } from "@/lib/hooks";
+import { useChildren } from "@/lib/hooks";
+import { useTree } from "@/lib/context";
 import type { NodeDto } from "@/types/taxonomy";
 import Loader from "./Loader";
 import ErrorMsg from "./ErrorMsg";

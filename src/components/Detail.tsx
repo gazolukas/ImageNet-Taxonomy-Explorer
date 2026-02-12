@@ -1,6 +1,7 @@
 "use client";
 
-import { useDetail, useTree } from "@/lib/hooks";
+import { useDetail } from "@/lib/hooks";
+import { useTree } from "@/lib/context";
 import Loader from "./Loader";
 import ErrorMsg from "./ErrorMsg";
 

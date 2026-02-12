@@ -1,7 +1,8 @@
 "use client";
 
 import { useDeferredValue, useState } from "react";
-import { useSearch, useTree } from "@/lib/hooks";
+import { useSearch } from "@/lib/hooks";
+import { useTree } from "@/lib/context";
 
 export const Search = () => {
   const { navigateTo } = useTree();
