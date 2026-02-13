@@ -2,14 +2,26 @@
 
 import { createContext, useCallback, useContext, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { childrenOptions } from "./options";
+import type { InfiniteData } from "@tanstack/react-query";
+import {
+  childrenOptions,
+  fetchPosition,
+  fetchChildrenPage,
+  getAncestorPairs,
+  prefetchChildrenPages,
+} from "./api";
+import type { ChildrenPage } from "@/types/taxonomy";
+import { CHILDREN_PAGE_SIZE } from "./constants";
 
 type Context = {
   selectedPath: string | null;
   expanded: Set<string>;
+  scrollToPath: string | null;
   selectNode: (path: string) => void;
   toggleNode: (path: string) => void;
   navigateTo: (path: string) => Promise<void>;
+  loadMoreChildren: (parentPath: string) => Promise<void>;
+  clearScrollTo: () => void;
 };
 
 export const Context = createContext<Context | null>(null);
@@ -23,43 +35,71 @@ export const Provider = ({ children }: ProviderProps) => {
 
   const [selectedPath, selectNode] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [scrollToPath, setScrollToPath] = useState<string | null>(null);
 
-  const toggleNode = useCallback((path: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
+  const clearScrollTo = useCallback(() => setScrollToPath(null), []);
 
-      if (next.has(path)) {
-        next.delete(path);
-      } else {
-        next.add(path);
+  const toggleNode = useCallback(
+    (path: string) => {
+      let isExpanding = false;
+
+      setExpanded((prev) => {
+        const next = new Set(prev);
+        if (next.has(path)) {
+          next.delete(path);
+        } else {
+          next.add(path);
+          isExpanding = true;
+        }
+        return next;
+      });
+
+      if (isExpanding) {
+        void queryClient.ensureInfiniteQueryData(childrenOptions(path));
       }
+    },
+    [queryClient],
+  );
 
-      return next;
-    });
-  }, []);
+  const loadMoreChildren = useCallback(
+    async (parentPath: string) => {
+      const key = ["tree", "children", parentPath];
+      const currentData =
+        queryClient.getQueryData<InfiniteData<ChildrenPage, number>>(key);
+
+      if (!currentData) return;
+
+      const lastParam =
+        currentData.pageParams[currentData.pageParams.length - 1];
+      const lastPage = currentData.pages[currentData.pages.length - 1];
+
+      if (!lastPage.hasMore) return;
+
+      const nextOffset = lastParam + CHILDREN_PAGE_SIZE;
+      const nextPage = await fetchChildrenPage(parentPath, nextOffset);
+
+      queryClient.setQueryData<InfiniteData<ChildrenPage, number>>(key, {
+        pages: [...currentData.pages, nextPage],
+        pageParams: [...currentData.pageParams, nextOffset],
+      });
+    },
+    [queryClient],
+  );
 
   const navigateTo = useCallback(
     async (path: string) => {
-      const segments = path.split(" > ");
-      const paths = [];
+      const pairs = getAncestorPairs(path);
 
-      if (segments.length > 1) {
-        let cursor = "";
+      await Promise.all(
+        pairs.map(async ({ parent, child }) => {
+          const { pageIndex } = await fetchPosition(parent, child);
+          await prefetchChildrenPages(queryClient, parent, pageIndex);
+        }),
+      );
 
-        for (let i = 0; i < segments.length - 1; i++) {
-          cursor = cursor ? `${cursor} > ${segments[i]}` : segments[i];
-          paths.push(cursor);
-        }
-
-        await Promise.all(
-          paths.map((path) =>
-            queryClient.ensureQueryData(childrenOptions(path)),
-          ),
-        );
-      }
-
-      setExpanded(new Set(paths));
+      setExpanded(new Set(pairs.map(({ parent }) => parent)));
       selectNode(path);
+      setScrollToPath(path);
     },
     [queryClient],
   );
@@ -69,9 +109,12 @@ export const Provider = ({ children }: ProviderProps) => {
       value={{
         selectedPath,
         expanded,
+        scrollToPath,
         selectNode,
         toggleNode,
         navigateTo,
+        loadMoreChildren,
+        clearScrollTo,
       }}
     >
       {children}

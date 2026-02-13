@@ -1,6 +1,8 @@
+import { QueryWrapper } from "@/providers/queryProvider";
+import { OrbitWrapper } from "@/providers/orbitProvider";
+import { Box, Stack } from "@kiwicom/orbit-components";
 import type { Metadata } from "next";
-import { QueryProvider } from "@/lib/query-client";
-import "./globals.css";
+import "@kiwicom/orbit-components/lib/tailwind.css";
 
 export const metadata: Metadata = {
   title: "ImageNet Taxonomy Explorer",
@@ -15,14 +17,13 @@ export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <body>
-        <QueryProvider>
-          <main className="layout">
-            <header>
-              <h1>ImageNet Explorer</h1>
-            </header>
-            {children}
-          </main>
-        </QueryProvider>
+        <Stack justify="center">
+          <Box width="1200px" margin={{ top: "400" }}>
+            <OrbitWrapper>
+              <QueryWrapper>{children}</QueryWrapper>
+            </OrbitWrapper>
+          </Box>
+        </Stack>
       </body>
     </html>
   );

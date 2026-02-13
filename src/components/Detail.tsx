@@ -1,58 +1,65 @@
 "use client";
 
+import {
+  Alert,
+  Loading,
+  Text,
+  Stack,
+  Separator,
+} from "@kiwicom/orbit-components";
 import { useDetail } from "@/lib/hooks";
 import { useTree } from "@/lib/context";
-import Loader from "./Loader";
-import ErrorMsg from "./ErrorMsg";
+import Field from "./Field";
 
 export const Detail = () => {
   const { selectedPath } = useTree();
   const { data: node, isLoading, error } = useDetail(selectedPath);
 
   if (error) {
-    return <ErrorMsg message={error.message} />;
+    return (
+      <Alert type="critical" icon>
+        {error.message}
+      </Alert>
+    );
   }
 
   if (isLoading) {
-    return <Loader />;
+    return <Loading type="inlineLoader" />;
   }
 
   if (!node) {
-    return <p>Select a taxonomy node to inspect metadata.</p>;
+    return (
+      <Text type="secondary">Select a taxonomy node to inspect metadata.</Text>
+    );
   }
 
   return (
-    <dl>
-      {node.name && (
-        <div>
-          <dt>Name</dt>
-          <dd>{node.name}</dd>
-        </div>
-      )}
+    <Stack spacing="400">
+      {node.name && <Field label="Name">{node.name}</Field>}
       {node.path && (
-        <div>
-          <dt>Path</dt>
-          <dd className="mono">{node.path}</dd>
-        </div>
+        <>
+          <Separator />
+          <Field label="Path">{node.path}</Field>
+        </>
       )}
       {node.depth > 0 && (
-        <div>
-          <dt>Depth</dt>
-          <dd>{node.depth}</dd>
-        </div>
+        <>
+          <Separator />
+          <Field label="Depth">{node.depth}</Field>
+        </>
       )}
       {Boolean(node.childCount) && (
-        <div>
-          <dt>Children</dt>
-          <dd>{node.childCount ?? 0}</dd>
-        </div>
+        <>
+          <Separator />
+          <Field label="Children">{node.childCount ?? 0}</Field>
+        </>
       )}
       {node.size > 0 && (
-        <div>
-          <dt>Size</dt>
-          <dd>{node.size}</dd>
-        </div>
+        <>
+          <Separator />
+          <Field label="Size">{node.size}</Field>
+        </>
       )}
-    </dl>
+    </Stack>
   );
 };
