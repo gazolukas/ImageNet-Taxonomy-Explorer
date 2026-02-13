@@ -1,6 +1,6 @@
 "use client";
 
-import { useTree } from "@/lib/context";
+import { useTree } from "@/lib/store";
 import {
   ChevronDown,
   ChevronForward,

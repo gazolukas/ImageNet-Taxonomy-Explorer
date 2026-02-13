@@ -8,7 +8,7 @@ import {
   Separator,
 } from "@kiwicom/orbit-components";
 import { useDetail } from "@/lib/hooks";
-import { useTree } from "@/lib/context";
+import { useTree } from "@/lib/store";
 import Field from "./Field";
 
 export const Detail = () => {

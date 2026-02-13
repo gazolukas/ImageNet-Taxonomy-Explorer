@@ -8,15 +8,13 @@ import {
   Text,
 } from "@kiwicom/orbit-components";
 
-import { Provider } from "@/lib/context";
 import { Detail } from "@/components/Detail";
 import { Search } from "@/components/Search";
 import { Tree } from "@/components/Tree";
 
 const Home = () => {
   return (
-    <Provider>
-      <Stack spacing="600">
+    <Stack spacing="600">
         <Stack spacing="200">
           <Heading type="title1">ImageNet Explorer</Heading>
           <Text type="secondary">
@@ -46,8 +44,7 @@ const Home = () => {
             </CardSection>
           </Card>
         </Stack>
-      </Stack>
-    </Provider>
+    </Stack>
   );
 };
 

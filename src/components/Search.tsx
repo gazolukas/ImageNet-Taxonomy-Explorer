@@ -1,29 +1,29 @@
 "use client";
 
-import { useDeferredValue, useState } from "react";
+import { useState } from "react";
 import {
   InputField,
   Card,
-  CardSection,
   Stack,
   Text,
   ListChoice,
 } from "@kiwicom/orbit-components";
 import SearchIcon from "@kiwicom/orbit-components/lib/icons/Search";
 
-import { useSearch } from "@/lib/hooks";
-import { useTree } from "@/lib/context";
+import { useQueryClient } from "@tanstack/react-query";
+import { useDebouncedValue, useSearch } from "@/lib/hooks";
+import { useTree } from "@/lib/store";
 
 export const Search = () => {
+  const queryClient = useQueryClient();
   const { navigateTo } = useTree();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const searchValue = useDeferredValue(searchQuery).trim();
+  const searchValue = useDebouncedValue(searchQuery.trim());
   const { data: results, isFetching } = useSearch(searchValue);
 
   const handleResultClick = async (path: string) => {
-    await navigateTo(path);
     setSearchQuery("");
+    await navigateTo(path, queryClient);
   };
 
   return (
@@ -36,23 +36,22 @@ export const Search = () => {
         label="Search taxonomy"
       />
 
-      {searchValue.length > 0 && (
-        <Card>
-          <CardSection>
-            <Text size="small" type="secondary">
-              {isFetching ? "Searching…" : `${results?.length ?? 0} results`}
-            </Text>
-          </CardSection>
+      {searchQuery.length > 0 && (
+        <Stack spacing="200">
+          <Text size="small" type="secondary">
+            {isFetching ? "Searching…" : `${results?.length ?? 0} results`}
+          </Text>
           {results &&
             results.map((result) => (
-              <ListChoice
-                key={result.path}
-                title={result.name}
-                description={result.path}
-                onClick={() => handleResultClick(result.path)}
-              />
+              <Card key={result.path}>
+                <ListChoice
+                  title={result.name}
+                  description={result.path}
+                  onClick={() => handleResultClick(result.path)}
+                />
+              </Card>
             ))}
-        </Card>
+        </Stack>
       )}
     </Stack>
   );

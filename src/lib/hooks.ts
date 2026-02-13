@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { rootOptions, detailsOptions, searchOptions } from "./api";
 import { NodeDto } from "@/types/taxonomy";
-import { useTree } from "./context";
+import { useTree } from "./store";
 import { useEffect, useMemo, useState } from "react";
 import buildFlatTree from "@/components/helpers";
 
@@ -25,6 +25,17 @@ export function useSearch(query: string) {
   });
 }
 
+export function useDebouncedValue<T>(value: T, delay = 500) {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
+
 export function useFlatTree(root: NodeDto | undefined) {
   const { expanded } = useTree();
   const queryClient = useQueryClient();
@@ -34,7 +45,11 @@ export function useFlatTree(root: NodeDto | undefined) {
     return queryClient.getQueryCache().subscribe((event) => {
       const queryKey = event?.query.queryKey;
 
-      if (Array.isArray(queryKey) && queryKey[0] === "tree" && queryKey[1] === "children") {
+      if (
+        Array.isArray(queryKey) &&
+        queryKey[0] === "tree" &&
+        queryKey[1] === "children"
+      ) {
         setCacheVersion((prev) => prev + 1);
       }
     });

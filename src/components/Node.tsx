@@ -2,7 +2,8 @@
 
 import type { CSSProperties } from "react";
 import { Badge, Button, ButtonLink, Stack } from "@kiwicom/orbit-components";
-import { useTree } from "@/lib/context";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTree } from "@/lib/store";
 import type { NodeDto } from "@/types/taxonomy";
 import { ToggleIcon } from "./ToggleIcon";
 
@@ -19,6 +20,7 @@ type NodeProps = {
 };
 
 export const Node = ({ node, depth }: NodeProps) => {
+  const queryClient = useQueryClient();
   const { selectedPath, toggleNode, selectNode } = useTree();
 
   const hasChildren = (node.childCount ?? 0) > 0;
@@ -32,7 +34,7 @@ export const Node = ({ node, depth }: NodeProps) => {
         circled
         disabled={!hasChildren}
         iconLeft={<ToggleIcon node={node} />}
-        onClick={() => toggleNode(node.path)}
+        onClick={() => toggleNode(node.path, queryClient)}
       />
       <Stack inline>
         <Button

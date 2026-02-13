@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Loading, Alert, Text, Box, Stack } from "@kiwicom/orbit-components";
 import { useFlatTree, useRoot } from "@/lib/hooks";
-import { useTree } from "@/lib/context";
+import { useTree } from "@/lib/store";
 import { ROW_HEIGHT_ESTIMATE } from "@/lib/constants";
 import { Node } from "./Node";
 import { LoadingMore } from "./LoadingMore";
