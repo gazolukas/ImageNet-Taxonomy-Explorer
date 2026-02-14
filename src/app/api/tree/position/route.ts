@@ -32,14 +32,14 @@ export async function GET(request: NextRequest) {
 
   if (!parent) {
     return NextResponse.json(
-      { error: "Parent node not found." },
+      { error: "Parent not found." },
       { status: 404 },
     );
   }
 
   if (!child) {
     return NextResponse.json(
-      { error: "Child node not found." },
+      { error: "Child not found." },
       { status: 404 },
     );
   }

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import "@kiwicom/orbit-components/lib/tailwind.css";
 
 export const metadata: Metadata = {
-  title: "ImageNet Taxonomy Explorer",
+  title: "ImageNet Explorer",
   description: "Ingest, store, search, and visualize the ImageNet taxonomy",
 };
 

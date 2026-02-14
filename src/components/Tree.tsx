@@ -5,7 +5,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Loading, Alert, Text, Box, Stack } from "@kiwicom/orbit-components";
 import { useFlatTree, useRoot } from "@/lib/hooks";
 import { useTree } from "@/lib/store";
-import { ROW_HEIGHT_ESTIMATE } from "@/lib/constants";
+import { ROW_HEIGHT } from "@/lib/constants";
 import { Node } from "./Node";
 import { LoadingMore } from "./LoadingMore";
 
@@ -18,7 +18,7 @@ export const Tree = () => {
   const virtualizer = useVirtualizer({
     count: flatRows.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => ROW_HEIGHT_ESTIMATE,
+    estimateSize: () => ROW_HEIGHT,
     overscan: 15,
   });
 
@@ -47,7 +47,7 @@ export const Tree = () => {
   }
 
   if (!root) {
-    return <Text type="secondary">No taxonomy data found.</Text>;
+    return <Text type="secondary">No data found.</Text>;
   }
 
   return (

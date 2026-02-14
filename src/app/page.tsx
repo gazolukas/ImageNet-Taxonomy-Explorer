@@ -17,9 +17,7 @@ const Home = () => {
     <Stack spacing="600">
         <Stack spacing="200">
           <Heading type="title1">ImageNet Explorer</Heading>
-          <Text type="secondary">
-            Search, browse, and inspect the ImageNet taxonomy tree.
-          </Text>
+          <Text type="secondary">Browse the ImageNet taxonomy</Text>
         </Stack>
         <Search />
         <Stack flex>

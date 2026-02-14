@@ -22,10 +22,10 @@ export const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const searchValue = useDebouncedValue(searchQuery.trim());
-  const { data: results, isFetching } = useSearch(searchValue);
+  const debounced = useDebouncedValue(searchQuery.trim());
+  const { data: results, isFetching } = useSearch(debounced);
 
-  const handleResultClick = async (path: string) => {
+  const handleClick = async (path: string) => {
     setLoading(true);
     try {
       await navigateTo(path, queryClient);
@@ -39,10 +39,9 @@ export const Search = () => {
     <Stack spacing="200">
       <InputField
         prefix={<SearchIcon />}
-        placeholder="Type a category name or path…"
+        placeholder="Search"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        label="Search taxonomy"
       />
 
       {searchQuery.length > 0 && (
@@ -60,7 +59,7 @@ export const Search = () => {
                     <ListChoice
                       title={result.name}
                       description={result.path}
-                      onClick={() => handleResultClick(result.path)}
+                      onClick={() => handleClick(result.path)}
                     />
                   </Card>
                 ))}

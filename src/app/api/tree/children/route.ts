@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
   if (!parent) {
     return NextResponse.json(
-      { error: "Parent node not found." },
+      { error: "Parent not found." },
       { status: 404 },
     );
   }

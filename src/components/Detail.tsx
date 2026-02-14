@@ -29,7 +29,7 @@ export const Detail = () => {
 
   if (!node) {
     return (
-      <Text type="secondary">Select a taxonomy node to inspect metadata.</Text>
+      <Text type="secondary">Select node to view details.</Text>
     );
   }
 

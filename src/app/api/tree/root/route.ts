@@ -9,7 +9,7 @@ export async function GET() {
   });
 
   if (!root) {
-    return NextResponse.json({ error: "Root node not found." }, { status: 404 });
+    return NextResponse.json({ error: "Root not found." }, { status: 404 });
   }
 
   const childCount = await prisma.taxonomy.count({

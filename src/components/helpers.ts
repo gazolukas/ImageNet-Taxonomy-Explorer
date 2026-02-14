@@ -20,22 +20,22 @@ export default function buildFlatTree(
       "children",
       node.path,
     ]);
-    const depthValue = depth + 1;
+    const childDepth = depth + 1;
 
     if (!data) {
-      rows.push({ type: "loading", parentPath: node.path, depth: depthValue });
+      rows.push({ type: "loading", parentPath: node.path, depth: childDepth });
       return;
     }
 
     for (const child of data.pages.flatMap(({ children }) => children)) {
-      walk(child, depthValue);
+      walk(child, childDepth);
     }
 
     if (data.pages.at(-1)?.hasMore) {
       rows.push({
         type: "load-more",
         parentPath: node.path,
-        depth: depthValue,
+        depth: childDepth,
       });
     }
   };
