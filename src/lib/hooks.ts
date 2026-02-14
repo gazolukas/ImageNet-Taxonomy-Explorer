@@ -21,7 +21,6 @@ export function useSearch(query: string) {
   return useQuery({
     ...searchOptions(trimmed),
     enabled: trimmed.length > 0,
-    placeholderData: (prev) => prev,
   });
 }
 

@@ -7,6 +7,7 @@ import {
   Stack,
   Text,
   ListChoice,
+  Loading,
 } from "@kiwicom/orbit-components";
 import SearchIcon from "@kiwicom/orbit-components/lib/icons/Search";
 
@@ -17,13 +18,21 @@ import { useTree } from "@/lib/store";
 export const Search = () => {
   const queryClient = useQueryClient();
   const { navigateTo } = useTree();
+
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const searchValue = useDebouncedValue(searchQuery.trim());
   const { data: results, isFetching } = useSearch(searchValue);
 
   const handleResultClick = async (path: string) => {
-    setSearchQuery("");
-    await navigateTo(path, queryClient);
+    setLoading(true);
+    try {
+      await navigateTo(path, queryClient);
+      setSearchQuery("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,19 +47,25 @@ export const Search = () => {
 
       {searchQuery.length > 0 && (
         <Stack spacing="200">
-          <Text size="small" type="secondary">
-            {isFetching ? "Searching…" : `${results?.length ?? 0} results`}
-          </Text>
-          {results &&
-            results.map((result) => (
-              <Card key={result.path}>
-                <ListChoice
-                  title={result.name}
-                  description={result.path}
-                  onClick={() => handleResultClick(result.path)}
-                />
-              </Card>
-            ))}
+          {loading ? (
+            <Loading type="inlineLoader" />
+          ) : (
+            <>
+              <Text size="small" type="secondary">
+                {isFetching ? "Searching…" : `${results?.length ?? 0} results`}
+              </Text>
+              {results &&
+                results.map((result) => (
+                  <Card key={result.path}>
+                    <ListChoice
+                      title={result.name}
+                      description={result.path}
+                      onClick={() => handleResultClick(result.path)}
+                    />
+                  </Card>
+                ))}
+            </>
+          )}
         </Stack>
       )}
     </Stack>
